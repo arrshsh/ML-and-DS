@@ -267,22 +267,32 @@ def walk_through_dir(dir_path):
 # Function to evaluate: accuracy, precision, recall, f1-score
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support
 
+from sklearn.metrics import accuracy_score, precision_recall_fscore_support
+
 def calculate_results(y_true, y_pred):
-  """
-  Calculates model accuracy, precision, recall and f1 score of a binary classification model.
+    """
+    Calculates model accuracy, precision, recall, and f1-score of a binary classification model.
+    Ensures inputs are converted to NumPy arrays if necessary and handles device mismatches.
+    """
+    # Convert TensorFlow Tensors to NumPy arrays if necessary
+    y_true = y_true.numpy() if hasattr(y_true, "numpy") else y_true
+    y_pred = y_pred.numpy() if hasattr(y_pred, "numpy") else y_pred
 
-  Args:
-      y_true: true labels in the form of a 1D array
-      y_pred: predicted labels in the form of a 1D array
+    # Debugging information about device placement
+    print(f"y_true device: {y_true.device if hasattr(y_true, 'device') else 'CPU'}")
+    print(f"y_pred device: {y_pred.device if hasattr(y_pred, 'device') else 'CPU'}")
 
-  Returns a dictionary of accuracy, precision, recall, f1-score.
-  """
-  # Calculate model accuracy
-  model_accuracy = accuracy_score(y_true, y_pred) * 100
-  # Calculate model precision, recall and f1 score using "weighted average
-  model_precision, model_recall, model_f1, _ = precision_recall_fscore_support(y_true, y_pred, average="weighted")
-  model_results = {"accuracy": model_accuracy,
-                  "precision": model_precision,
-                  "recall": model_recall,
-                  "f1": model_f1}
-  return model_results
+    # Calculate model accuracy
+    model_accuracy = accuracy_score(y_true, y_pred) * 100
+    # Calculate other metrics
+    model_precision, model_recall, model_f1, _ = precision_recall_fscore_support(y_true, y_pred, average="weighted")
+
+    # Prepare the results
+    model_results = {
+        "accuracy": model_accuracy,
+        "precision": model_precision,
+        "recall": model_recall,
+        "f1": model_f1
+    }
+
+    return model_results
